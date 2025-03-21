@@ -1,0 +1,53 @@
+name: Package 2 Build, Test, and Deploy
+
+on:
+  push:
+    paths:
+      - 'package2/**'
+      - '.github/workflows/package2-build-test-deploy.yml'
+  pull_request:
+    paths:
+      - 'package2/**'
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          cd package2
+          python -m pip install --upgrade pip
+          python -m pip install pytest pytest-cov build
+      - name: Run tests
+        run: |
+          cd package2
+          pytest
+      - name: Build package
+        run: |
+          cd package2
+          python -m build
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: package2-wheel
+          path: package2/dist/*.whl
+  deploy:
+    needs: build_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download wheel artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: package2-wheel
+      - name: Deploy package
+        run: |
+          # Example deployment (replace with your actual deployment)
+          echo "Deploying Package 2..."
+          ls package2-wheel/*.whl
+          echo "Package 2 deployed."

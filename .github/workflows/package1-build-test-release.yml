@@ -1,0 +1,53 @@
+name: Package 1 Build, Test, and Release
+
+on:
+  push:
+    paths:
+      - 'package1/**'
+      - '.github/workflows/package1-build-test-release.yml'
+  pull_request:
+    paths:
+      - 'package1/**'
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          cd package1
+          python -m pip install --upgrade pip
+          python -m pip install pytest pytest-cov build
+      - name: Run tests
+        run: |
+          cd package1
+          pytest
+      - name: Build package
+        run: |
+          cd package1
+          python -m build
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: package1-wheel
+          path: package1/dist/*.whl
+  release:
+    needs: build_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download wheel artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: package1-wheel
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: package1-wheel/*.whl
+          tag_name: package1-v${{ github.run_number }}
+          name: Release Package 1 v${{ github.run_number }}
