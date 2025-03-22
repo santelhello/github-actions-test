@@ -54,9 +54,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: package1-wheel
+          path: package1/
+      - name: Debug list files in the downloaded artifact.
+        run: ls package1/dist/
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          files: package1-wheel/*.whl
+          files: package1/dist/*.whl
           tag_name: package1-v${{ github.run_number }}
           name: Release Package1 v${{ github.run_number }}
