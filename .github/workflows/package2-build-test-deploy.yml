@@ -75,6 +75,8 @@ jobs:
   deploy:
     needs: build_test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download wheel artifact
         uses: actions/download-artifact@v4
