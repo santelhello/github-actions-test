@@ -59,4 +59,4 @@ jobs:
         with:
           files: package1-wheel/*.whl
           tag_name: package1-v${{ github.run_number }}
-          name: Release Package 1 v${{ github.run_number }}
+          name: Release Package1 v${{ github.run_number }}
