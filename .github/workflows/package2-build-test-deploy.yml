@@ -58,7 +58,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: package2-wheel
-          path: package2/
+          path: package2/dist/
       - name: Debug list files in the downloaded artifact.
         run: ls package2/dist/    
       - name: Create release
