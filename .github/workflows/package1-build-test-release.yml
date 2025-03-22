@@ -45,7 +45,11 @@ jobs:
         with:
           name: package1-wheel
           path: package1/dist/*.whl
-
+      - name: List Artifacts
+        run: |
+          pwd
+          ls -la -R
+  
   release:
     needs: build_test
     runs-on: ubuntu-latest

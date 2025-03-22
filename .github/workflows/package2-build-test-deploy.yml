@@ -45,6 +45,10 @@ jobs:
         with:
           name: package2-wheel
           path: package2/dist/*.whl
+      - name: List Artifacts
+        run: |
+          pwd
+          ls -la -R
 
   release:
     needs: build_test
