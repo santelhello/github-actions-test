@@ -12,31 +12,40 @@ on:
 jobs:
   build_test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.13"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
           cd package1
           python -m pip install --upgrade pip
-          python -m pip install pytest pytest-cov build
+          python -m pip install flake8 pytest pytest-cov build
+      - name: Lint with flake8
+        run: |
+          cd package1
+          flake8 --exit-zero --ignore=E302
       - name: Run tests
         run: |
           cd package1
-          pytest
-      - name: Build package
+          python -m pytest
+      - name: Build Wheel package
         run: |
           cd package1
-          python -m build
+          python -m build -w
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
         with:
           name: package1-wheel
           path: package1/dist/*.whl
+
   release:
     needs: build_test
     runs-on: ubuntu-latest
