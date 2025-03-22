@@ -24,7 +24,7 @@ jobs:
           cd package2
           python -m pip install --upgrade pip
           python -m pip install pytest pytest-cov build
-      - name: Run tests
+      - name: Run testsgit -
         run: |
           cd package2
           pytest
@@ -33,7 +33,7 @@ jobs:
           cd package2
           python -m build
       - name: Upload wheel artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: package2-wheel
           path: package2/dist/*.whl
