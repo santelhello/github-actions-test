@@ -1,0 +1,71 @@
+name: Package 1 Build, Test, and Release
+
+on:
+  push:
+    paths:
+      - 'package1/**'
+      - '.github/workflows/package1-build-test-release.yml'
+  pull_request:
+    paths:
+      - 'package1/**'
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.13"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          cd package1
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pytest pytest-cov build
+      - name: Lint with flake8
+        run: |
+          cd package1
+          flake8 --exit-zero --ignore=E302
+      - name: Run tests
+        run: |
+          cd package1
+          python -m pytest
+      - name: Build Wheel package
+        run: |
+          cd package1
+          python -m build -w
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package1-wheel
+          path: package1/dist/*.whl
+      - name: List Artifacts
+        run: |
+          pwd
+          ls -la -R
+  
+  release:
+    needs: build_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download wheel artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: package1-wheel
+          path: package1/dist/
+      - name: Debug list files in the downloaded artifact.
+        run: ls package1/dist/
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: package1/dist/*.whl
+          tag_name: package1-v${{ github.run_number }}
+          name: Release Package1 v${{ github.run_number }}
